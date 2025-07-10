@@ -24,14 +24,14 @@ def index():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form['username']
+        email = request.form['email']      # formdaki 'email' ile eşleşiyor
         password = request.form['password']
 
-        existing_user = db.users.find_one({'username': username})
+        existing_user = db.users.find_one({'username': email})
         if existing_user:
             return "Kullanıcı zaten kayıtlı!"
         
-        db.users.insert_one({'username': username, 'password': password})
+        db.users.insert_one({'username': email, 'password': password})
         return redirect(url_for('login'))
     return render_template('register.html')
 
@@ -39,12 +39,12 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
+        email = request.form['email']
         password = request.form['password']
 
-        user = db.users.find_one({'username': username, 'password': password})
+        user = db.users.find_one({'username': email, 'password': password})
         if user:
-            session['username'] = username
+            session['username'] = email
             return redirect(url_for('dreamlist'))
         else:
             return "Kullanıcı adı veya şifre yanlış!"
