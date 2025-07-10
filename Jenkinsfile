@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE_NAME = "10.77.3.24/library/dreamlist-app"
         DOCKER_REGISTRY = "10.77.3.24"
-        KUBECONFIG = "/root/.kube/config"
+        KUBECONFIG = "/var/lib/jenkins/.kube/config"
     }
 
     stages {
@@ -37,10 +37,8 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                withEnv(["KUBECONFIG=$KUBECONFIG"]) {
-                    script {
-                        sh 'kubectl set image deployment/dreamlist-app-deployment flask-app=$DOCKER_IMAGE_NAME:latest -n default'
-                    }
+                script {
+                    sh 'kubectl set image deployment/dreamlist-app-deployment flask-app=$DOCKER_IMAGE_NAME:latest -n default'
                 }
             }
         }
