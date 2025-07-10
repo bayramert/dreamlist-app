@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE_NAME = "10.77.3.24/library/dreamlist-app"
+        DOCKER_IMAGE_NAME = "10.77.3.24:80/library/dreamlist-app"
         DOCKER_REGISTRY = "10.77.3.24"
         KUBECONFIG = "/var/lib/jenkins/.kube/config"
     }
