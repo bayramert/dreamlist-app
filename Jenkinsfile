@@ -23,11 +23,21 @@ pipeline {
 
         stage('Push to Harbor') {
             steps {
-                withCredentials([
-                    usernamePassword(credentialsId: 'harbor-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')
-                ]) {
+                withCredentials([usernamePassword(
+                    credentialsId: 'harbor-creds',
+                    usernameVariable: 'DOCKER_USERNAME',
+                    passwordVariable: 'DOCKER_PASSWORD'
+                )]) {
                     sh 'docker login $DOCKER_REGISTRY -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
                     sh 'docker push $DOCKER_IMAGE_NAME:latest'
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    sh 'kubectl set image deployment/dreamlist-app-deployment dreamlist-app=10.77.3.24/library/dreamlist-app:latest -n default'
                 }
             }
         }
