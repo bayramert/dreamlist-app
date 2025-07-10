@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Hayallerim{% endblock %}
+{% block content %}
+<h2>Hayallerim</h2>
+<ul class="list-group">
+    {% for dream in dreams %}
+        <li class="list-group-item">{{ dream.dream }}</li>
+    {% else %}
+        <li class="list-group-item">Henüz hayal eklemediniz.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
