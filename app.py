@@ -16,6 +16,10 @@ mongo_uri = f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}@{MONGO_HOST}:{MONGO_PO
 client = MongoClient(mongo_uri)
 db = client.dreamlist_db
 
+@app.route('/')
+def index():
+    return redirect(url_for('login'))
+
 # Kullanıcı kayıt sayfası
 @app.route('/register', methods=['GET', 'POST'])
 def register():
