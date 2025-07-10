@@ -18,7 +18,7 @@ db = client.dreamlist_db
 
 @app.route('/')
 def index():
-    return redirect(url_for('login'))
+    return redirect(url_for('home'))
 
 # Kullanıcı kayıt sayfası
 @app.route('/register', methods=['GET', 'POST'])
