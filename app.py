@@ -77,4 +77,4 @@ def delete_dream(dream_id):
     return redirect(url_for('dreamlist'))
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
