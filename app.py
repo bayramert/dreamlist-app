@@ -7,12 +7,12 @@ app = Flask(__name__)
 app.secret_key = 'gizli_anahtar'  # Gerçek ortamda daha güvenli bir anahtar kullan
 
 # MongoDB bağlantısı için ortam değişkenleri
-MONGO_HOST = os.getenv("MONGO_HOST", "mongo")  # Kubernetes servis adı muhtemelen mongo
+MONGO_HOST = os.getenv("MONGO_HOST", "mongo")  # Kubernetes servis adı genelde "mongo"
 MONGO_PORT = int(os.getenv("MONGO_PORT", 27017))
 MONGO_USERNAME = os.getenv("MONGO_USERNAME", "")
 MONGO_PASSWORD = os.getenv("MONGO_PASSWORD", "")
 
-# Eğer kullanıcı adı ve şifre yoksa mongo URI farklı olur, ona göre ayarla
+# Kullanıcı adı ve şifre varsa URI'ye ekle
 if MONGO_USERNAME and MONGO_PASSWORD:
     mongo_uri = f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}@{MONGO_HOST}:{MONGO_PORT}/"
 else:
@@ -21,16 +21,10 @@ else:
 client = MongoClient(mongo_uri)
 db = client.dreamlist_db
 
-# Ana sayfa: /home olarak açılır, giriş yoksa /login yönlendirilir
+# Ana sayfa: / ile açıldığında direkt home.html açılır
 @app.route('/')
-def root():
-    return redirect(url_for('home'))
-
-@app.route('/home')
 def home():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-    return redirect(url_for('dreamlist'))
+    return render_template('home.html')
 
 # Kayıt sayfası
 @app.route('/register', methods=['GET', 'POST'])
@@ -88,7 +82,7 @@ def dreamlist():
             db.dreams.insert_one({'username': username, 'dream': new_dream})
 
     dreams = list(db.dreams.find({'username': username}))
-    return render_template('dreamlist.html', dreams=dreams)
+    return render_template('detail.html', dreams=dreams)
 
 # Hayal silme işlemi
 @app.route('/delete/<dream_id>')
@@ -96,13 +90,10 @@ def delete_dream(dream_id):
     if 'username' not in session:
         return redirect(url_for('login'))
 
-    # Sadece o kullanıcıya ait hayal silinsin diye kontrol ekleyelim
     username = session['username']
     db.dreams.delete_one({'_id': ObjectId(dream_id), 'username': username})
     flash("Hayal silindi.", "success")
     return redirect(url_for('dreamlist'))
 
-
 if __name__ == "__main__":
-    # debug=True hata detayları için (prod ortamda kapat)
     app.run(host="0.0.0.0", port=5000, debug=True)
