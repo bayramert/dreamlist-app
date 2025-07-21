@@ -4,29 +4,20 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 
 app = Flask(__name__)
-app.secret_key = 'gizli_anahtar'  # Gerçek ortamda daha güvenli bir anahtar kullan
+app.secret_key = 'gizli_anahtar'  # Gerçek ortamda güvenli anahtar kullan
 
 # MongoDB bağlantısı için ortam değişkenleri
-MONGO_HOST = os.getenv("MONGO_HOST", "mongo")  # Kubernetes servis adı genelde "mongo"
+MONGO_HOST = os.getenv("MONGO_HOST", "mongo")
 MONGO_PORT = int(os.getenv("MONGO_PORT", 27017))
-MONGO_USERNAME = os.getenv("MONGO_USERNAME", "")
-MONGO_PASSWORD = os.getenv("MONGO_PASSWORD", "")
 
-# Kullanıcı adı ve şifre varsa URI'ye ekle
-if MONGO_USERNAME and MONGO_PASSWORD:
-    mongo_uri = f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}@{MONGO_HOST}:{MONGO_PORT}/"
-else:
-    mongo_uri = f"mongodb://{MONGO_HOST}:{MONGO_PORT}/"
-
+mongo_uri = f"mongodb://{MONGO_HOST}:{MONGO_PORT}/"
 client = MongoClient(mongo_uri)
 db = client.dreamlist_db
 
-# Ana sayfa: / ile açıldığında direkt home.html açılır
 @app.route('/')
 def home():
     return render_template('home.html')
 
-# Kayıt sayfası
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -44,7 +35,6 @@ def register():
 
     return render_template('register.html')
 
-# Giriş sayfası
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -61,14 +51,12 @@ def login():
 
     return render_template('login.html')
 
-# Çıkış yap
 @app.route('/logout')
 def logout():
     session.pop('username', None)
     flash("Başarıyla çıkış yapıldı.", "info")
     return redirect(url_for('login'))
 
-# Kullanıcı hayal listesi sayfası
 @app.route('/dreamlist', methods=['GET', 'POST'])
 def dreamlist():
     if 'username' not in session:
@@ -84,7 +72,6 @@ def dreamlist():
     dreams = list(db.dreams.find({'username': username}))
     return render_template('detail.html', dreams=dreams)
 
-# Hayal silme işlemi
 @app.route('/delete/<dream_id>')
 def delete_dream(dream_id):
     if 'username' not in session:

@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE_NAME = "10.77.3.24:80/library/dreamlist-app"
+        DOCKER_IMAGE_NAME = "bayramert/dreamlist-app"
     }
 
     stages {
@@ -20,19 +20,7 @@ pipeline {
             }
         }
 
-        stage('Login to Harbor') {
-            steps {
-                withCredentials([string(credentialsId: 'harbor-password', variable: 'DOCKER_PASSWORD')]) {
-                    sh "docker login 10.77.3.24:80 -u admin -p${DOCKER_PASSWORD}"
-                }
-            }
-        }
-
-        stage('Push Image') {
-            steps {
-                sh "docker push ${DOCKER_IMAGE_NAME}:latest"
-            }
-        }
+        // Harbor login ve push kaldırıldı
 
         stage('Deploy to Kubernetes') {
             steps {
